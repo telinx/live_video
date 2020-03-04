@@ -14,8 +14,37 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: LiveVideoMainPage(),
+      home: MainPage(),
     );
   }
 }
+
+class MainPage extends StatelessWidget {
+  // This widget is the root of your application.
+  @override
+  Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+    return Scaffold(
+      body: Center(
+        child: GestureDetector(
+          onTap: (){
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (context){
+                return LiveVideoMainPage(screenWidth: screenWidth, screenHeight: screenHeight,);
+              }),
+            );
+          },
+          child: Container(
+            alignment: Alignment.center,
+            color: Colors.black12,
+            child: Text('clicj'),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+
 

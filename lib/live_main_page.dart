@@ -7,12 +7,18 @@ import 'live_list_page.dart';
 
 class LiveVideoMainPage extends StatefulWidget{
 
+  LiveVideoMainPage({Key key, this.screenWidth, this.screenHeight}): super(key: key);
+
+  final double screenWidth;
+
+  final double screenHeight;
+
   @override
   _LiveVideoMainPageState createState() => _LiveVideoMainPageState();
 
 }
 
-class _LiveVideoMainPageState extends State<LiveVideoMainPage> with SingleTickerProviderStateMixin{
+class _LiveVideoMainPageState extends State<LiveVideoMainPage> with TickerProviderStateMixin{
 
   List<LiveRoom> liveRoomList;
 
@@ -24,16 +30,13 @@ class _LiveVideoMainPageState extends State<LiveVideoMainPage> with SingleTicker
 
   Animation animationX;
 
-  double offsetX;
+  double offsetX = 0.0;
 
-  double screenWidth;
-
-  double screenHeight;
 
   @override
   void initState() {
     super.initState();
-    liveRoomList= List.generate(20, (index){
+    liveRoomList = List.generate(20, (index){
       return LiveRoom(
         roomId: '$index',
         title: '托管于华东教育网骨干节点$index',
@@ -44,6 +47,7 @@ class _LiveVideoMainPageState extends State<LiveVideoMainPage> with SingleTicker
         viewCount: '100M',
       );
     });
+  
   }
 
   @override
@@ -55,7 +59,7 @@ class _LiveVideoMainPageState extends State<LiveVideoMainPage> with SingleTicker
     setState(() => this.currentIndex = index);
     animationControllerX = AnimationController(duration: Duration(milliseconds: 200), vsync: this);
     final curve = CurvedAnimation(parent: animationControllerX, curve: Curves.easeOutCubic);
-    animationX = Tween(begin: 0.0, end: -1 * this.screenWidth ).animate(curve)
+    animationX = Tween(begin: 0.0, end: -1 * widget.screenWidth ).animate(curve)
       ..addListener(() {
         setState(() {
           offsetX = animationX.value;
@@ -67,23 +71,30 @@ class _LiveVideoMainPageState extends State<LiveVideoMainPage> with SingleTicker
 
   @override
   Widget build(BuildContext context) {
-    this.screenWidth = MediaQuery.of(context).size.width;
-    this.screenHeight = MediaQuery.of(context).size.height;
+    
+    print('main page =====>${this.liveRoomList.length}');
+
+    LiveRoom detailLiveRoom;
+    if(this.currentIndex != null){
+      detailLiveRoom = this.liveRoomList[this.currentIndex];
+    }
+
     return Scaffold(
       body: Stack(
         children: <Widget>[
-          LiveListPage(liveRoomList: this.liveRoomList, offsetX: this.offsetX, onChangeIndex: onChangeIndex),
+          LiveListPage(liveRoomList: this.liveRoomList, offsetX: this.offsetX, onChangeIndex: onChangeIndex, screenWidth: widget.screenWidth),
           GestureDetector(
             // 水平方向滑动结束
           onHorizontalDragEnd: (details) {
             // 当滑动停止的时候 根据 offsetX 的偏移量进行动画
             // 为了方便这里取 screenWidth / 2为临界条件
-            if (offsetX.abs() < screenWidth / 2) {
+            print('onHorizontalDragEnd===>>>');
+            if (offsetX.abs() < widget.screenWidth / 2) {
               animateToMiddle();
             } else if (offsetX > 0) {
               // animateToLeft(screenWidth);
             } else {
-              animateToRight(screenWidth);
+              animateToRight(widget.screenWidth);
             }
           },
           // 水平方向滑动开始
@@ -93,13 +104,13 @@ class _LiveVideoMainPageState extends State<LiveVideoMainPage> with SingleTicker
           // 水平方向滑动中
           onHorizontalDragUpdate: (details) {
             // 控制 offsetX 的值在 -screenWidth 到 screenWidth 之间
-            if (offsetX + details.delta.dx >= screenWidth) {
+            if (offsetX + details.delta.dx >= widget.screenWidth) {
               setState(() {
-                offsetX = screenWidth;
+                offsetX = widget.screenWidth;
               });
-            } else if (offsetX + details.delta.dx <= -screenWidth) {
+            } else if (offsetX + details.delta.dx <= -widget.screenWidth) {
               setState(() {
-                offsetX = -screenWidth;
+                offsetX = -widget.screenWidth;
               });
             } else {
               setState(() {
@@ -108,10 +119,10 @@ class _LiveVideoMainPageState extends State<LiveVideoMainPage> with SingleTicker
             }
           },
             child: LiveVideoDetailPage(
-              liveRoom: currentIndex ?? this.liveRoomList[currentIndex], 
+              liveRoom: detailLiveRoom, 
               offsetX: this.offsetX,
-              screenHeight:this.screenHeight,
-              screenWidth: this.screenWidth,
+              screenHeight: widget.screenHeight,
+              screenWidth: widget.screenWidth,
             ),
           ),
         ],

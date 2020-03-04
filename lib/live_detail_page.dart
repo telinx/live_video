@@ -1,4 +1,7 @@
+import 'dart:math';
+
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
@@ -62,17 +65,25 @@ class _LiveVideoDetailPageState extends State<LiveVideoDetailPage> with SingleTi
 
   @override
   Widget build(BuildContext context) {
+    Widget page;
     if(widget.liveRoom == null){
-      return Container(
+      page = Container(
         alignment: Alignment.center,
         child: Text('no'),
       );
+    }else{
+      page = Container(
+        height: widget.screenHeight,
+        width: widget.screenWidth,
+        color: Colors.white,
+        child: this.buildContent(context),
+      );
     }
-    return Container(
-      height: widget.screenHeight,
-      width: widget.screenWidth,
-      child: this.buildContent(context),
+    return Transform.translate(
+      offset: Offset(max(0, widget.offsetX + widget.screenWidth), 0),
+      child: page 
     );
+
   }
 
   Widget buildContent(BuildContext context) {
@@ -103,6 +114,8 @@ class _LiveVideoDetailPageState extends State<LiveVideoDetailPage> with SingleTi
 
             Expanded(
               child: TabBarView(
+                physics: BouncingScrollPhysics(),
+                dragStartBehavior: DragStartBehavior.start,
                 controller: this._tabController,
                 children: tabList.map((item) {
                   return Stack(children: <Widget>[

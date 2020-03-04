@@ -16,6 +16,7 @@ class LiveListPage extends StatelessWidget{
     @required this.liveRoomList, 
     @required this.offsetX,
     @required this.onChangeIndex,
+    @required this.screenWidth
   }): super(key: key);
 
 
@@ -25,12 +26,14 @@ class LiveListPage extends StatelessWidget{
 
   final OnChangeIndex onChangeIndex;
 
+  final double screenWidth;
+
 
   @override
   Widget build(BuildContext context) {
 
     return Transform.translate(
-      offset: Offset(max(0, this.offsetX + MediaQuery.of(context).size.width), 0),
+      offset: Offset(offsetX > 0 ? offsetX : offsetX / 5, 0),
       child: this.buildPage(context),
     );
 
@@ -44,9 +47,8 @@ class LiveListPage extends StatelessWidget{
   }
 
   Widget buildContent(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
     double spacing = 10.0;
-    double width = (screenWidth - 3*spacing)/2;
+    double width = (this.screenWidth - 3*spacing)/2;
 
     List<Widget> widgetList;
     if(null != this.liveRoomList){
