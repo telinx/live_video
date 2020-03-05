@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:live_video/live_detail_page.dart';
 import 'package:live_video/route_transitions.dart';
+import 'package:live_video/test_gesture.dart';
 import 'package:live_video/test_page.dart';
 
 import 'model.dart';
@@ -77,7 +78,9 @@ class LiveListPage extends StatelessWidget{
                 PageRouteTransition(
                   animationType: AnimationType.slide_up,
                   builder: (context){
-                    return TestPage();
+                    // return TestPage();
+                    // return MyStatefulWidget();
+                    return DemoApp();
                   // return LiveVideoDetailPage(liveRoom: this.liveRoomList[i], offsetX: 0.0, screenWidth: this.screenWidth,);
                   }
                 )

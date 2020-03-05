@@ -134,3 +134,72 @@ class HeaderImage extends StatelessWidget {
     );
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class MyStatefulWidget extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() {
+    return CustomerState();
+  }
+}
+
+class CustomerState extends State<MyStatefulWidget> {
+  int _num = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Container(
+          height: 400,
+          child: Row(children: <Widget>[
+      GestureDetector(
+        onTap: () {
+          setState(() {
+            _num++;
+          });
+        },
+        child: Container(
+          height: 100.0,
+          color: Colors.black12,
+          child: Text("Click My"),
+        ),
+      ),
+      Text("1:AAAAA"),
+      Text("2:BBBBB"),
+      Text("3:C:" + _num.toString()),
+      CustomerContainer()
+    ]),
+        )
+      )
+    );
+  }
+}
+
+class CustomerContainer extends StatelessWidget {
+
+  const CustomerContainer({Key key}): super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+  	// for (int i = 0; i < 1000; i++) {
+  	// 	print("我是一个耗时操作 for:" + i.toString());
+  	// }
+    print('CustomerContainer=====>>>>');
+    return Container(
+      child: Text("4:DDDD"),
+    );
+  }
+}
