@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:live_video/live_detail_page.dart';
 import 'package:live_video/route_transitions.dart';
-import 'package:live_video/test_page.dart';
 
 import 'model.dart';
 
@@ -64,24 +63,14 @@ class LiveListPage extends StatelessWidget{
               // }));
 
               // this.onChangeIndex(i);
-              // Navigator.of(context).push(PageRouteTransition(
-              //   animationType: AnimationType.slide_right,
-              //   builder: (context){
-              //     return LiveVideoDetailPage(liveRoom: this.liveRoomList[i],  screenWidth: this.screenWidth,screenHeight : this.screenHeight);
-              //     // return LiveVideoDetailPage(liveRoom: this.liveRoomList[i], offsetX: 0.0, screenWidth: this.screenWidth,);
-              //   }
-              // ));
-
-              // this.onChangeIndex(i);
-              Navigator.of(context).push(
-                PageRouteTransition(
-                  animationType: AnimationType.slide_up,
-                  builder: (context){
-                    return TestPage();
+              Navigator.of(context).push(PageRouteTransition(
+                animationType: AnimationType.slide_right,
+                builder: (context){
+                  // return LiveVideoDetailPage(liveRoom: this.liveRoomList[i],  screenWidth: this.screenWidth,screenHeight : this.screenHeight);
+                  return LiveVideoDetailPage(liveRoom: null,  screenWidth: this.screenWidth,screenHeight : this.screenHeight);
                   // return LiveVideoDetailPage(liveRoom: this.liveRoomList[i], offsetX: 0.0, screenWidth: this.screenWidth,);
-                  }
-                )
-              );
+                }
+              ));
             },
             child: LiveVideoListItemWidget(liveRoom: this.liveRoomList[i], width: width,),
           )

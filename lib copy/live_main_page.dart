@@ -82,7 +82,7 @@ class _LiveVideoMainPageState extends State<LiveVideoMainPage> with TickerProvid
     return Scaffold(
       body: Stack(
         children: <Widget>[
-          LiveListPage(liveRoomList: this.liveRoomList, offsetX: this.offsetX, onChangeIndex: onChangeIndex, screenWidth: widget.screenWidth, screenHeight: widget.screenHeight,),
+          // LiveListPage(liveRoomList:  this.liveRoomList, offsetX: this.offsetX, onChangeIndex: onChangeIndex, screenWidth: widget.screenWidth),
           GestureDetector(
             // 水平方向滑动结束
           onHorizontalDragEnd: (details) {
