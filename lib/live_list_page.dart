@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:live_video/live_detail_page.dart';
@@ -61,30 +62,30 @@ class LiveListPage extends StatelessWidget{
               print("sadasdasdsdd====>screenHeight: ${this.screenHeight}====screenWidth: ${this.screenWidth}");
               // this.onChangeIndex(i);
               // Navigator.of(context).push(CupertinoPageRoute(builder: (context){
-              //   return LiveVideoDetailPage(liveRoom: this.liveRoomList[i], offsetX: 0.0, screenWidth: this.screenWidth,);
+              //   return LiveVideoDetailPage(liveRoom: this.liveRoomList[i], screenWidth: this.screenWidth,);
               // }));
 
               // this.onChangeIndex(i);
-              // Navigator.of(context).push(PageRouteTransition(
-              //   animationType: AnimationType.slide_right,
-              //   builder: (context){
-              //     return LiveVideoDetailPage(liveRoom: this.liveRoomList[i],  screenWidth: this.screenWidth,screenHeight : this.screenHeight);
-              //     // return LiveVideoDetailPage(liveRoom: this.liveRoomList[i], offsetX: 0.0, screenWidth: this.screenWidth,);
-              //   }
-              // ));
+              Navigator.of(context).push(PageRouteTransition(
+                animationType: AnimationType.slide_right,
+                builder: (context){
+                  return LiveVideoDetailPage(liveRoom: this.liveRoomList[i],  screenWidth: this.screenWidth,screenHeight : this.screenHeight);
+                  // return LiveVideoDetailPage(liveRoom: this.liveRoomList[i], offsetX: 0.0, screenWidth: this.screenWidth,);
+                }
+              ));
 
               // this.onChangeIndex(i);
-              Navigator.of(context).push(
-                PageRouteTransition(
-                  animationType: AnimationType.slide_up,
-                  builder: (context){
-                    // return TestPage();
-                    // return MyStatefulWidget();
-                    return DemoApp();
-                  // return LiveVideoDetailPage(liveRoom: this.liveRoomList[i], offsetX: 0.0, screenWidth: this.screenWidth,);
-                  }
-                )
-              );
+              // Navigator.of(context).push(
+              //   PageRouteTransition(
+              //     animationType: AnimationType.slide_up,
+              //     builder: (context){
+              //       // return TestPage();
+              //       // return MyStatefulWidget();
+              //       return DemoApp();
+              //     // return LiveVideoDetailPage(liveRoom: this.liveRoomList[i], offsetX: 0.0, screenWidth: this.screenWidth,);
+              //     }
+              //   )
+              // );
             },
             child: LiveVideoListItemWidget(liveRoom: this.liveRoomList[i], width: width,),
           )
@@ -105,6 +106,8 @@ class LiveListPage extends StatelessWidget{
   }
 
 }
+
+
 
 
 class LiveVideoListItemWidget extends StatelessWidget{

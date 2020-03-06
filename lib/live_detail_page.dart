@@ -7,6 +7,8 @@ import 'package:flutter/widgets.dart';
 
 import 'model.dart';
 
+bool absorbing = false;
+bool isScrolling = false;
 class LiveVideoDetailPage extends StatefulWidget{
 
   LiveVideoDetailPage({
@@ -55,76 +57,12 @@ class _LiveVideoDetailPageState extends State<LiveVideoDetailPage> with TickerPr
     _tabController = TabController(initialIndex: 0, length: 3, vsync: this);
     _tabController.addListener(changeIndex);
 
-    _recognizer = HorizontalDragGestureRecognizer(debugOwner: this)
-      ..onStart = _handleDragStart
-      ..onUpdate = _handleDragUpdate
-      ..onEnd = _handleDragEnd
-      ..onCancel = _handleDragCancel;
+
 
   }
   
 
-   void _handleDragStart(DragStartDetails details) {
-    // _backGestureController = widget.onStartPopGesture();
-    print("_handleDragStart======>>>>");
-    animationControllerX?.stop();
-  }
-
-  void _handleDragUpdate(DragUpdateDetails details) {
-    // assert(mounted);
-    // assert(_backGestureController != null);
-    // _backGestureController.dragUpdate(_convertToLogical(details.primaryDelta / context.size.width));
-    // print("_handleDragUpdate======>>>>${details.globalPosition}===>Start");
-    
-    if(this.currentIndex != 0 && details.globalPosition.dy > (widget.screenWidth * 9 / 16)){
-      print("_handleDragUpdate======>>>>${details.globalPosition}===>stop");
-    }else{
-      if (offsetX + details.delta.dx >= widget.screenWidth) {
-      setState(() {
-        offsetX = widget.screenWidth;
-      });
-    } else if (offsetX + details.delta.dx <= -widget.screenWidth) {
-      setState(() {
-        // offsetX = -widget.screenWidth;
-          offsetX = 0.0;
-      });
-    } else {
-      setState(() {
-        offsetX += details.delta.dx;
-      });
-    }
-    }
-    
-
-    
-  }
-
-  void _handleDragEnd(DragEndDetails details) {
-    // assert(mounted);
-    // assert(_backGestureController != null);
-    // _backGestureController.dragEnd(_convertToLogical(details.velocity.pixelsPerSecond.dx / context.size.width));
-    // _backGestureController = null;
-    // print("_handleDragStart======>>>>");
-      // 当滑动停止的时候 根据 offsetX 的偏移量进行动画
-    // 为了方便这里取 screenWidth / 2为临界条件
-    // print('onHorizontalDragEnd===>>>');
-    if (offsetX.abs() < widget.screenWidth / 2) {
-      animateToMiddle();
-    } else if (offsetX.abs() > widget.screenWidth / 2) {
-      animateToLeft(context, widget.screenWidth);
-    } else {
-      // animateToRight(widget.screenWidth);
-    }
-  }
-
-  void _handleDragCancel() {
-    // assert(mounted);
-    // // This can be called even if start is not called, paired with the "down" event
-    // // that we don't consider here.
-    // _backGestureController?.dragEnd(0.0);
-    // _backGestureController = null;
-    // print("_handleDragStart======>>>>");
-  }
+   
 
   @override
   void dispose() {
@@ -134,17 +72,19 @@ class _LiveVideoDetailPageState extends State<LiveVideoDetailPage> with TickerPr
 
   void changeIndex(){
     if(this._tabController.index == 0){
+      absorbing = false;
       setState(() {
         this.currentIndex = 0;
         this.absorbingTabView = false;
       });
     }else{
+      absorbing = true;
       setState(() {
         this.currentIndex = this._tabController.index;
         this.absorbingTabView = true;
       });
     }
-    print('changeIndex====>>>>currentIndex: ${this.currentIndex}====${this.absorbingTabView}');
+    // print('changeIndex====>>>>currentIndex: ${this.currentIndex}====${this.absorbingTabView}');
   }
 
   @override
@@ -210,30 +150,89 @@ class _LiveVideoDetailPageState extends State<LiveVideoDetailPage> with TickerPr
     //   child: page,
     // );
 
-    page = Stack(
-      children: <Widget>[
-        // GestureDetector(
-        //   onTap: (){
-        //     print("GestureDetector===>tap");
-        //   },
-        //   child: page,
-        // ),
-        PositionedDirectional(
-          start: 0.0,
-          width: widget.screenWidth ,
-          top: 0.0,
-          bottom: 0.0,
-          child: Listener(
-              onPointerDown: _handlePointerDown,
-              behavior: HitTestBehavior.opaque,
-              child: page,
-            ),
-        )
-      ],
-    );
+    // page = Stack(
+    //   children: <Widget>[
+    //     // GestureDetector(
+    //     //   onTap: (){
+    //     //     print("GestureDetector===>tap");
+    //     //   },
+    //     //   child: page,
+    //     // ),
+    //     PositionedDirectional(
+    //       start: 0.0,
+    //       width: widget.screenWidth ,
+    //       top: 0.0,
+    //       bottom: 0.0,
+    //       child: Listener(
+    //           onPointerDown: _handlePointerDown,
+    //           behavior: HitTestBehavior.opaque,
+    //           child: page,
+    //         ),
+    //     )
+    //   ],
+    // );
     
 
     // return page;
+
+    
+
+    page =  RawGestureDetector(
+      gestures: {
+        AllowMultipleGestureRecognizer: GestureRecognizerFactoryWithHandlers<
+            AllowMultipleGestureRecognizer>(
+          () => AllowMultipleGestureRecognizer(),
+          (AllowMultipleGestureRecognizer instance) {
+            // instance.onTap = () => print('Episode 4 is best! (parent container) ');
+            // instance.onUpdate
+            instance.onEnd = (DragEndDetails details) {
+              if(isScrolling) return;
+              // if(isScrolling)return ;
+            // 当滑动停止的时候 根据 offsetX 的偏移量进行动画
+            // 为了方便这里取 screenWidth / 2为临界条件
+            // print('onHorizontalDragEnd===>>>');
+            if (offsetX.abs() < widget.screenWidth / 2) {
+              animateToMiddle();
+            } else if (offsetX.abs() > widget.screenWidth / 2) {
+              animateToLeft(context, widget.screenWidth);
+            } else {
+              // animateToRight(widget.screenWidth);
+            }
+          };
+          // 水平方向滑动开始
+          instance.onStart = (_) {
+            if(isScrolling) return;
+            animationControllerX?.stop();
+          };
+          // 水平方向滑动中
+          instance.onUpdate = (details) {
+            if(isScrolling) return;
+            // 控制 offsetX 的值在 -screenWidth 到 0.0 之间
+            print("onHorizontalDragUpdate======>>>>>>>>delta: ${details.delta}");
+            if (offsetX + details.delta.dx >= widget.screenWidth) {
+              setState(() {
+                offsetX = widget.screenWidth;
+              });
+            } else if (offsetX + details.delta.dx <= -widget.screenWidth) {
+              setState(() {
+                // offsetX = -widget.screenWidth;
+                offsetX = 0.0;
+              });
+            } else {
+              setState(() {
+                offsetX += details.delta.dx;
+              });
+            }
+            // print("onHorizontalDragUpdate======>>>>>>>>$offsetX");
+            };
+          }
+        )
+      },
+      behavior: HitTestBehavior.opaque,
+      //Parent Container
+      child: page
+      
+    );
 
     return Transform.translate(
       offset: Offset(max(0, this.offsetX), 0),
@@ -250,6 +249,8 @@ class _LiveVideoDetailPageState extends State<LiveVideoDetailPage> with TickerPr
   ///
   /// [offsetX] to [screenWidth]
   void animateToLeft(BuildContext context, double screenWidth) {
+    absorbing = false;
+    isScrolling = false;
     Navigator.of(context).pop();
     // animationControllerX =
     //     AnimationController(duration: Duration(milliseconds: offsetX.abs() * 1000 ~/ 500), vsync: this);
@@ -278,6 +279,71 @@ class _LiveVideoDetailPageState extends State<LiveVideoDetailPage> with TickerPr
   }
 
   Widget buildContent(BuildContext context) {
+
+    Widget tabView = TabBarView(
+      physics: BouncingScrollPhysics(),
+      dragStartBehavior: DragStartBehavior.start,
+      controller: this._tabController,
+      children: tabList.map((item) {
+        // return Stack(children: <Widget>[
+        //   Align(alignment:Alignment.topCenter,child: Text(item),),
+        // ],);
+        return Container(
+          color: Colors.red.withOpacity(0.3),
+          width: widget.screenWidth,
+          child:  NotificationListener(
+            onNotification: (notification){
+              // print(notification.metrics.pixels); // 当前滚动位置
+              // print(notification.metrics.maxScrollExtent); // 滚功最大范围
+              switch (notification.runtimeType){
+                // case ScrollStartNotification: print("开始滚动"); break;
+                case ScrollStartNotification: {
+                  // print("正在滚动"); 
+                  isScrolling = true;
+                  break;
+                }
+                case ScrollEndNotification: {
+                  isScrolling = false;
+                  // print("滚动停止"); 
+                  break;
+                }
+                // case OverscrollNotification: print("滚动到边界"); break;
+              }
+              return true;
+            },
+            child: SingleChildScrollView(
+              child: Column(
+                children: List.generate(
+                  100, 
+                  (index) =>Container(
+                      alignment: Alignment.center,
+                      width: widget.screenWidth,
+                      color: Colors.green,
+                      height: 50.0,
+                      padding: EdgeInsets.only(bottom: 10.0),
+                      child: Text('$item'),
+                    )
+                ),
+              ),
+            )
+          )
+          );
+      }).toList(),
+    );
+
+    tabView = RawGestureDetector(
+            gestures: {
+              AllowMultipleGestureRecognizer:
+                  GestureRecognizerFactoryWithHandlers<
+                      AllowMultipleGestureRecognizer>(
+                () => AllowMultipleGestureRecognizer(),  //constructor
+                (AllowMultipleGestureRecognizer instance) {  //initializer
+                },
+              )
+            },
+            //Creates the nested container within the first.
+            child: tabView);
+
     return Stack(
       children: <Widget>[
         Column(
@@ -304,51 +370,7 @@ class _LiveVideoDetailPageState extends State<LiveVideoDetailPage> with TickerPr
             ),
 
             Expanded(
-              child: Listener(
-                onPointerMove: (PointerMoveEvent pointerMoveEvent){
-                  if(this.currentIndex == 0){
-                    // print('PointerMoveEvent----->>>${pointerMoveEvent.delta.dx}');
-                    // if(pointerMoveEvent.delta.dx > 0){
-                    //   setState(() {
-                    //     this.absorbingTabView = true;
-                    //   });
-                    // }else{
-                    //    setState(() {
-                    //     this.absorbingTabView = false;
-                    //   });
-                    // }
-                  }
-                },
-                child: TabBarView(
-                    physics: BouncingScrollPhysics(),
-                    dragStartBehavior: DragStartBehavior.start,
-                    controller: this._tabController,
-                    children: tabList.map((item) {
-                      // return Stack(children: <Widget>[
-                      //   Align(alignment:Alignment.topCenter,child: Text(item),),
-                      // ],);
-                      return Container(
-                        color: Colors.red.withOpacity(0.3),
-                        width: widget.screenWidth,
-                        child:  SingleChildScrollView(
-                          child: Column(
-                            children: List.generate(
-                              100, 
-                              (index) =>Container(
-                                  alignment: Alignment.center,
-                                  width: widget.screenWidth,
-                                  color: Colors.green,
-                                  height: 50.0,
-                                  padding: EdgeInsets.only(bottom: 10.0),
-                                  child: Text('$item'),
-                                )
-                            ),
-                          ),
-                        )
-                        );
-                    }).toList(),
-                  ),
-                ),
+              child: tabView,
             ),
 
           ],
@@ -378,3 +400,20 @@ class _LiveVideoDetailPageState extends State<LiveVideoDetailPage> with TickerPr
   }
 
 }
+
+class AllowMultipleGestureRecognizer extends HorizontalDragGestureRecognizer {
+  
+  /// Create a gesture recognizer for interactions in the vertical axis.
+  @override
+  void rejectGesture(int pointer) {
+    print("rejectGesture====>>>>absorbing: $absorbing===isScrolling: $isScrolling");
+    if(!absorbing && !isScrolling){
+      acceptGesture(pointer);
+    }
+    
+  }
+}
+
+
+
+
